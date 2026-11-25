@@ -1,0 +1,2564 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>微分的概念</title>
+<style>
+  :root {
+    --pri: #2563eb;
+    --pri-h: #1d4ed8;
+    --ok: #16a34a;
+    --ok-bg: #ecfdf5;
+    --ok-bd: #a7f3d0;
+    --ok-tx: #065f46;
+    --bad: #dc2626;
+    --bad-bg: #fef2f2;
+    --bad-bd: #fecaca;
+    --bad-tx: #991b1b;
+    --dx: #ea580c;
+    --dy: #7c3aed;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --text: #1e293b;
+    --mut: #64748b;
+    --bd: #e2e8f0;
+    --soft: #eff6ff;
+    --soft-bd: #bfdbfe;
+    --soft-tx: #1e3a8a;
+    --evo-bg: #fffbeb;
+    --evo-bd: #fde68a;
+    --evo-tx: #92400e;
+    --chip: #f1f5f9;
+    --grid: #e2e8f0;
+    --axis: #94a3b8;
+    --ink: #0f172a;
+    --shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+    --float-shadow: 0 12px 32px rgba(15, 23, 42, 0.18);
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --pri: #3b82f6;
+      --pri-h: #2563eb;
+      --ok: #22c55e;
+      --ok-bg: #052e16;
+      --ok-bd: #166534;
+      --ok-tx: #bbf7d0;
+      --bad: #f87171;
+      --bad-bg: #450a0a;
+      --bad-bd: #991b1b;
+      --bad-tx: #fecaca;
+      --dx: #fb923c;
+      --dy: #a78bfa;
+      --bg: #0f172a;
+      --card: #1e293b;
+      --text: #e2e8f0;
+      --mut: #94a3b8;
+      --bd: #334155;
+      --soft: #172554;
+      --soft-bd: #1e40af;
+      --soft-tx: #bfdbfe;
+      --evo-bg: #29200b;
+      --evo-bd: #78350f;
+      --evo-tx: #fde68a;
+      --chip: #334155;
+      --grid: #334155;
+      --axis: #64748b;
+      --ink: #f8fafc;
+      --shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      --float-shadow: 0 14px 36px rgba(0, 0, 0, 0.5);
+      color-scheme: dark;
+    }
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+    font-style: normal;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    padding: 16px 16px 90px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .main {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 430px;
+    gap: 20px;
+    align-items: start;
+  }
+
+  @media (max-width: 980px) {
+    .main {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  header {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  h1 {
+    font-size: 1.65rem;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: 0.02em;
+  }
+
+  .sub {
+    color: var(--mut);
+    font-size: 0.96rem;
+    font-weight: 600;
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: 14px;
+    border: 1px solid var(--bd);
+    padding: 18px;
+    box-shadow: var(--shadow);
+    min-width: 0;
+  }
+
+  button {
+    cursor: pointer;
+    font-family: inherit;
+    font-style: normal;
+    transition: all 0.16s ease;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  /* 自訂函數列 */
+  .fbar {
+    background: var(--chip);
+    border: 1px solid var(--bd);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .fin {
+    flex: 1;
+    min-width: 140px;
+    padding: 8px 12px;
+    border: 1.5px solid var(--axis);
+    border-radius: 8px;
+    font-size: 0.96rem;
+    font-weight: 700;
+    color: var(--ink);
+    background: var(--card);
+    outline: none;
+  }
+
+  .fin:focus {
+    border-color: var(--pri);
+  }
+
+  .bdark {
+    background: var(--ink);
+    color: var(--bg);
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.88rem;
+  }
+
+  .bdark:hover {
+    opacity: 0.88;
+  }
+
+  .calc-toggle {
+    background: var(--card);
+    border: 1.5px solid var(--pri);
+    color: var(--pri);
+    padding: 7px 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.86rem;
+  }
+
+  .calc-toggle:hover,
+  .calc-toggle.open {
+    background: var(--pri);
+    color: #ffffff;
+  }
+
+  /* 可展開／收合數學計算機鍵盤 */
+  .calc-wrap {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.28s ease, opacity 0.2s ease;
+  }
+
+  .calc-wrap.open {
+    max-height: 280px;
+    opacity: 1;
+  }
+
+  .calc-grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 6px;
+    background: var(--card);
+    border: 1px solid var(--bd);
+    border-radius: 10px;
+    padding: 8px;
+    margin-top: 2px;
+  }
+
+  .ckey {
+    padding: 9px 4px;
+    border-radius: 8px;
+    border: 1px solid var(--bd);
+    background: var(--chip);
+    color: var(--ink);
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-align: center;
+    user-select: none;
+  }
+
+  .ckey:hover {
+    border-color: var(--pri);
+    color: var(--pri);
+  }
+
+  .ckey.var {
+    background: var(--soft);
+    border-color: var(--soft-bd);
+    color: var(--soft-tx);
+  }
+
+  .ckey.op {
+    background: var(--evo-bg);
+    border-color: var(--evo-bd);
+    color: var(--evo-tx);
+  }
+
+  .ckey.clr {
+    background: var(--bad-bg);
+    border-color: var(--bad-bd);
+    color: var(--bad-tx);
+  }
+
+  .ckey.go {
+    background: var(--ok);
+    border-color: var(--ok);
+    color: #ffffff;
+  }
+
+  .ckey.go:hover {
+    filter: brightness(0.92);
+    color: #ffffff;
+  }
+
+  @media (max-width: 480px) {
+    .ckey {
+      font-size: 0.8rem;
+      padding: 8px 2px;
+    }
+  }
+
+  .tag {
+    background: var(--card);
+    border: 1px solid var(--axis);
+    padding: 4px 10px;
+    border-radius: 16px;
+    color: var(--text);
+    font-weight: 700;
+    font-size: 0.82rem;
+  }
+
+  .tag:hover {
+    border-color: var(--pri);
+    color: var(--pri);
+  }
+
+  .tag.active {
+    background: var(--pri);
+    color: #ffffff;
+    border-color: var(--pri);
+  }
+
+  .err {
+    color: var(--bad);
+    font-size: 0.84rem;
+    font-weight: 700;
+    display: none;
+  }
+
+  /* 畫布容器 */
+  .cbox {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    min-height: 360px;
+    background: var(--card);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--bd);
+    user-select: none;
+  }
+
+  canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: grab;
+    touch-action: none;
+  }
+
+  canvas:active {
+    cursor: grabbing;
+  }
+
+  .hud {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(15, 23, 42, 0.84);
+    color: #ffffff;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    pointer-events: none;
+    max-width: calc(100% - 24px);
+  }
+
+  .zt {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .zb {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    border: 1px solid var(--bd);
+    background: var(--card);
+    color: var(--ink);
+    font-size: 1.3rem;
+    font-weight: 800;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .zb:hover {
+    border-color: var(--pri);
+    color: var(--pri);
+  }
+
+  /* 右側步驟標題與斜率演進卡片 */
+  .stp {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--soft);
+    padding: 10px 14px;
+    border-radius: 10px;
+    border-left: 4px solid var(--pri);
+    gap: 8px;
+  }
+
+  .stp b {
+    color: var(--soft-tx);
+    font-size: 0.98rem;
+  }
+
+  .cnt {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--pri);
+    background: var(--card);
+    padding: 2px 10px;
+    border-radius: 12px;
+    white-space: nowrap;
+  }
+
+  .evo-card {
+    margin-top: 12px;
+    background: var(--evo-bg);
+    border: 1.5px solid var(--evo-bd);
+    border-radius: 12px;
+    padding: 12px 14px;
+  }
+
+  .evo-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+
+  .evo-title {
+    font-size: 0.86rem;
+    font-weight: 800;
+    color: var(--evo-tx);
+  }
+
+  .evo-stage {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--evo-tx);
+    background: var(--card);
+    border: 1px solid var(--evo-bd);
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+
+  .fm {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: var(--card);
+    padding: 12px 10px;
+    border-radius: 10px;
+    border: 1px solid var(--bd);
+    font-weight: 800;
+    font-size: 0.95rem;
+    flex-wrap: wrap;
+    color: var(--ink);
+  }
+
+  .lim {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.08;
+    margin-right: 2px;
+  }
+
+  .lim small {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--pri);
+  }
+
+  .fr {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.25;
+  }
+
+  .fr > span:first-child {
+    border-bottom: 2px solid var(--ink);
+    padding: 0 6px 3px;
+  }
+
+  .fr > span:last-child {
+    padding: 3px 6px 0;
+  }
+
+  .evo-note {
+    margin-top: 8px;
+    font-size: 0.84rem;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  .c-dx { color: var(--dx); }
+  .c-dy { color: var(--dy); }
+  .c-ok { color: var(--ok); }
+  .c-bad { color: var(--bad); }
+  .c-pri { color: var(--pri); }
+
+  /* 步驟內容區 */
+  .sc {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    font-size: 0.94rem;
+    margin-top: 14px;
+  }
+
+  .ba {
+    background: var(--pri);
+    color: #ffffff;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.92rem;
+  }
+
+  .ba:hover {
+    background: var(--pri-h);
+  }
+
+  .bs {
+    background: var(--chip);
+    color: var(--text);
+    border: 1px solid var(--bd);
+    padding: 9px 12px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+
+  .bs:hover {
+    border-color: var(--pri);
+    color: var(--pri);
+  }
+
+  .bg {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .bg > button {
+    flex: 1;
+  }
+
+  .ct {
+    font-weight: 800;
+    color: var(--ink);
+    background: var(--chip);
+    padding: 2px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--bd);
+    display: inline-block;
+  }
+
+  .ci {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .ci label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.88rem;
+    font-weight: 700;
+  }
+
+  input[type="range"] {
+    accent-color: var(--pri);
+    width: 100%;
+    cursor: pointer;
+  }
+
+  /* 暖身狀態與小挑戰 */
+  .status-pill {
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: var(--soft);
+    border: 1px solid var(--soft-bd);
+    color: var(--soft-tx);
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+
+  .chal-box {
+    background: var(--chip);
+    border: 1px solid var(--bd);
+    border-radius: 10px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.88rem;
+  }
+
+  .chal-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--mut);
+  }
+
+  .chal-item.done {
+    color: var(--ok);
+    font-weight: 700;
+  }
+
+  /* 單選題與回饋 */
+  .qo {
+    padding: 10px 12px;
+    border: 1.5px solid var(--bd);
+    border-radius: 10px;
+    cursor: pointer;
+    background: var(--card);
+    margin-top: 8px;
+    font-weight: 600;
+    transition: all 0.15s ease;
+  }
+
+  .qo:hover {
+    border-color: var(--pri);
+  }
+
+  .qo.sel {
+    border-color: var(--pri);
+    background: var(--soft);
+    color: var(--soft-tx);
+    font-weight: 700;
+  }
+
+  .fb {
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 0.89rem;
+    display: none;
+    line-height: 1.55;
+  }
+
+  .fb.ok {
+    display: block;
+    background: var(--ok-bg);
+    color: var(--ok-tx);
+    border: 1px solid var(--ok-bd);
+  }
+
+  .fb.no {
+    display: block;
+    background: var(--bad-bg);
+    color: var(--bad-tx);
+    border: 1px solid var(--bad-bd);
+  }
+
+  /* 步驟 4 對照表 */
+  .cmp-tbl {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.84rem;
+    background: var(--card);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--bd);
+  }
+
+  .cmp-tbl th,
+  .cmp-tbl td {
+    padding: 7px 8px;
+    text-align: center;
+    border-bottom: 1px solid var(--bd);
+  }
+
+  .cmp-tbl th {
+    background: var(--chip);
+    font-weight: 700;
+    color: var(--mut);
+  }
+
+  .cmp-tbl tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* 步驟 5 微距按鈕、0/0 警告與 lim 引導 */
+  .micro-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .mbtn {
+    background: var(--card);
+    border: 1px solid var(--axis);
+    color: var(--text);
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+
+  .mbtn:hover {
+    border-color: var(--pri);
+    color: var(--pri);
+    background: var(--soft);
+  }
+
+  .mbtn.warn {
+    border-color: var(--bad);
+    color: var(--bad);
+    background: var(--bad-bg);
+  }
+
+  .mbtn.warn:hover {
+    background: var(--bad);
+    color: #ffffff;
+  }
+
+  .zero-warn {
+    display: inline-block;
+    background: var(--bad-bg);
+    color: var(--bad-tx);
+    border: 1px solid var(--bad-bd);
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.84rem;
+    font-weight: 800;
+  }
+
+  .stat {
+    background: var(--chip);
+    border: 1px solid var(--bd);
+    padding: 12px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .lim-hint {
+    background: var(--soft);
+    border: 1px dashed var(--pri);
+    color: var(--soft-tx);
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .lim-box {
+    display: none;
+    background: var(--bad-bg);
+    border: 1.5px solid var(--bad-bd);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 0.87rem;
+    color: var(--text);
+    line-height: 1.55;
+  }
+
+  .lim-box.show {
+    display: block;
+  }
+
+  .lim-box h4 {
+    color: var(--bad-tx);
+    font-size: 0.94rem;
+    margin-bottom: 6px;
+  }
+
+  .lim-box ol {
+    padding-left: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .def {
+    background: var(--soft);
+    border: 1.5px solid var(--soft-bd);
+    border-radius: 12px;
+    padding: 14px;
+  }
+
+  .def h4 {
+    color: var(--soft-tx);
+    margin-bottom: 8px;
+    font-size: 1rem;
+  }
+
+  .jump-bar {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--bd);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-size: 0.82rem;
+    color: var(--mut);
+    font-weight: 700;
+  }
+
+  /* =========================================================
+     右下角可收合浮動 AI 助教（林老師）
+     ========================================================= */
+  .ai-widget {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+  }
+
+  @media (max-width: 480px) {
+    .ai-widget {
+      right: 12px;
+      bottom: 12px;
+    }
+  }
+
+  /* 收合時的短提示氣泡 */
+  .ai-toast {
+    max-width: 270px;
+    background: var(--card);
+    color: var(--text);
+    border: 1.5px solid var(--pri);
+    border-radius: 14px 14px 4px 14px;
+    padding: 10px 12px;
+    font-size: 0.84rem;
+    line-height: 1.45;
+    box-shadow: var(--float-shadow);
+    display: none;
+    align-items: flex-start;
+    gap: 8px;
+    animation: popIn 0.25s ease;
+  }
+
+  .ai-toast.show {
+    display: flex;
+  }
+
+  .ai-toast-close {
+    background: transparent;
+    border: none;
+    color: var(--mut);
+    font-size: 0.95rem;
+    font-weight: 800;
+    padding: 0 2px;
+    line-height: 1;
+  }
+
+  .ai-toast-close:hover {
+    color: var(--ink);
+  }
+
+  /* 收合狀態膠囊按鈕 */
+  .ai-fab {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--pri);
+    color: #ffffff;
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    border-radius: 999px;
+    padding: 8px 16px 8px 8px;
+    box-shadow: var(--float-shadow);
+    position: relative;
+  }
+
+  .ai-fab:hover {
+    transform: translateY(-3px);
+    background: var(--pri-h);
+  }
+
+  .ai-fab-av {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #eff6ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .ai-fab-av svg {
+    width: 40px;
+    height: 40px;
+  }
+
+  .ai-fab-txt {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.25;
+  }
+
+  .ai-fab-txt strong {
+    font-size: 0.92rem;
+    font-weight: 800;
+  }
+
+  .ai-fab-txt small {
+    font-size: 0.74rem;
+    opacity: 0.92;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .online-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #4ade80;
+    display: inline-block;
+  }
+
+  .unread-dot {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #ef4444;
+    border: 2px solid #ffffff;
+    display: none;
+  }
+
+  .unread-dot.show {
+    display: block;
+  }
+
+  /* 展開狀態的浮動對話視窗 */
+  .ai-panel {
+    width: 360px;
+    max-width: calc(100vw - 24px);
+    height: 470px;
+    max-height: calc(100vh - 96px);
+    background: var(--card);
+    border: 1.5px solid var(--soft-bd);
+    border-radius: 16px;
+    box-shadow: var(--float-shadow);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    animation: popIn 0.22s ease;
+  }
+
+  .ai-panel.open {
+    display: flex;
+  }
+
+  @keyframes popIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px) scale(0.97);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .ai-head {
+    background: var(--pri);
+    color: #ffffff;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .ai-head-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .ai-head-av {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #eff6ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .ai-head-av svg {
+    width: 34px;
+    height: 34px;
+  }
+
+  .ai-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: none;
+    background: rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-close:hover {
+    background: rgba(255, 255, 255, 0.32);
+  }
+
+  .ai-hist {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: var(--bg);
+  }
+
+  .m {
+    display: flex;
+  }
+
+  .m.s {
+    justify-content: flex-end;
+  }
+
+  .bub {
+    max-width: 86%;
+    padding: 9px 12px;
+    border-radius: 12px;
+    font-size: 0.87rem;
+    line-height: 1.5;
+    word-break: break-word;
+  }
+
+  .m.t .bub {
+    background: var(--card);
+    color: var(--text);
+    border: 1px solid var(--bd);
+    border-top-left-radius: 3px;
+  }
+
+  .m.s .bub {
+    background: var(--pri);
+    color: #ffffff;
+    border-top-right-radius: 3px;
+  }
+
+  .ai-chips {
+    padding: 8px 10px;
+    border-top: 1px solid var(--bd);
+    background: var(--card);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    max-height: 92px;
+    overflow-y: auto;
+  }
+
+  .chip {
+    background: var(--soft);
+    border: 1px solid var(--soft-bd);
+    color: var(--soft-tx);
+    padding: 4px 9px;
+    border-radius: 999px;
+    font-size: 0.77rem;
+    font-weight: 700;
+  }
+
+  .chip:hover {
+    background: var(--pri);
+    color: #ffffff;
+    border-color: var(--pri);
+  }
+
+  .ai-foot {
+    padding: 10px;
+    border-top: 1px solid var(--bd);
+    background: var(--card);
+    display: flex;
+    gap: 8px;
+  }
+
+  .ai-foot input {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 12px;
+    border: 1.5px solid var(--axis);
+    border-radius: 8px;
+    font-size: 0.88rem;
+    background: var(--bg);
+    color: var(--ink);
+    outline: none;
+  }
+
+  .ai-foot input:focus {
+    border-color: var(--pri);
+  }
+
+  .ai-foot button {
+    background: var(--pri);
+    color: #ffffff;
+    border: none;
+    padding: 0 14px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.88rem;
+  }
+
+  .ai-foot button:hover {
+    background: var(--pri-h);
+  }
+</style>
+</head>
+<body>
+
+<div class="main">
+  <!-- 頂部標題 -->
+  <header>
+    <h1>微分的概念</h1>
+    <p class="sub" id="subText">暖身：複習直線的斜率</p>
+  </header>
+
+  <!-- 左側：自訂函數列 + 互動繪圖區 -->
+  <div class="card">
+    <div class="fbar" id="fbar" style="display:none">
+      <div class="row">
+        <b>自訂函數 f(x) ＝</b>
+        <input class="fin" id="fin" value="x^3 - 2x" placeholder="例如：x^3 - 2x 或 sin(x)">
+        <button class="bdark" id="applyBtn" type="button">套用函數</button>
+        <button class="calc-toggle" id="calcToggle" type="button" aria-expanded="false">🧮 計算機鍵盤 ▾</button>
+      </div>
+
+      <!-- 可展開／收合數學計算機鍵盤 -->
+      <div class="calc-wrap" id="calcWrap">
+        <div class="calc-grid" id="calcGrid">
+          <button class="ckey var" type="button" data-ins="x">x</button>
+          <button class="ckey var" type="button" data-ins="x^2">x<sup>2</sup></button>
+          <button class="ckey var" type="button" data-ins="x^3">x<sup>3</sup></button>
+          <button class="ckey var" type="button" data-ins="^" title="輸入任意次方">x<sup>n</sup></button>
+          <button class="ckey var" type="button" data-ins="(">(</button>
+          <button class="ckey var" type="button" data-ins=")">)</button>
+
+          <button class="ckey" type="button" data-ins="7">7</button>
+          <button class="ckey" type="button" data-ins="8">8</button>
+          <button class="ckey" type="button" data-ins="9">9</button>
+          <button class="ckey op" type="button" data-ins="/">÷</button>
+          <button class="ckey op" type="button" data-ins="*">×</button>
+          <button class="ckey clr" type="button" data-act="bs">⌫</button>
+
+          <button class="ckey" type="button" data-ins="4">4</button>
+          <button class="ckey" type="button" data-ins="5">5</button>
+          <button class="ckey" type="button" data-ins="6">6</button>
+          <button class="ckey op" type="button" data-ins="+">+</button>
+          <button class="ckey op" type="button" data-ins="-">−</button>
+          <button class="ckey clr" type="button" data-act="clr">C</button>
+
+          <button class="ckey" type="button" data-ins="1">1</button>
+          <button class="ckey" type="button" data-ins="2">2</button>
+          <button class="ckey" type="button" data-ins="3">3</button>
+          <button class="ckey" type="button" data-ins="0">0</button>
+          <button class="ckey" type="button" data-ins=".">.</button>
+          <button class="ckey go" type="button" data-act="apply">套用 ✓</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <span style="color:var(--mut);font-weight:700;font-size:0.82rem">課本範例：</span>
+        <button class="tag" type="button" data-preset="x^3 - 2x" data-a="1">x<sup>3</sup> − 2x</button>
+        <button class="tag" type="button" data-preset="x^2" data-a="1">x<sup>2</sup></button>
+        <button class="tag" type="button" data-preset="0.5x^3 + 1.5x^2" data-a="-1">0.5x<sup>3</sup> + 1.5x<sup>2</sup></button>
+        <button class="tag" type="button" data-preset="x^3 - 3x - 2" data-a="1.2">x<sup>3</sup> − 3x − 2</button>
+      </div>
+      <div class="err" id="ferr">⚠️ 函數格式無法辨識，請輸入合法的數學式（例如：x^3 - 2x、0.5x^2 + 1、sin(x)）</div>
+    </div>
+
+    <div class="cbox" id="cbox">
+      <canvas id="cv"></canvas>
+      <div class="hud" id="hud">直接拖曳 A、B 兩點觀察斜率變化</div>
+      <div class="zt" id="ztools" style="display:none">
+        <button class="zb" id="zin" type="button" title="放大">+</button>
+        <button class="zb" id="zout" type="button" title="縮小">−</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 右側：探究引導面板 -->
+  <div class="card">
+    <div class="stp">
+      <b id="stepTitle">暖身：複習直線的斜率</b>
+      <span class="cnt" id="stepCount">0 / 6</span>
+    </div>
+
+    <!-- 固定持續顯示的「斜率計算式演進」卡片 -->
+    <div class="evo-card">
+      <div class="evo-head">
+        <span class="evo-title">📐 斜率計算式演進</span>
+        <span class="evo-stage" id="evoStage">兩點斜率公式</span>
+      </div>
+      <div class="fm" id="evoFormula"></div>
+      <div class="evo-note" id="evoNote"></div>
+    </div>
+
+    <!-- 步驟 0：暖身複習直線的斜率 -->
+    <div class="sc" id="s0">
+      <p>在認識曲線的切線之前，先用滑鼠或手指<b>直接拖曳左圖中的 A、B 兩點</b>（自動吸附 0.5 格線），感受直線傾斜程度與斜率的關係！</p>
+      <div class="status-pill" id="slopeStatus">↗ 往右上傾斜：斜率為正</div>
+      <div class="row">
+        <span style="font-size:0.82rem;color:var(--mut);font-weight:700">快速範例：</span>
+        <button class="tag" type="button" data-ab="-1,-1,2,2">正斜率</button>
+        <button class="tag" type="button" data-ab="-2,2,2,-1">負斜率</button>
+        <button class="tag" type="button" data-ab="-2,1.5,2,1.5">水平線</button>
+        <button class="tag" type="button" data-ab="1,-2,1,2">鉛直線</button>
+      </div>
+      <div class="chal-box">
+        <b>🎯 動手小挑戰（拖曳 A、B 兩點完成）：</b>
+        <div class="chal-item" id="chPos">⬜ 做出一條「正斜率」直線（往右上）</div>
+        <div class="chal-item" id="chNeg">⬜ 做出一條「負斜率」直線（往右下）</div>
+        <div class="chal-item" id="chZero">⬜ 做出一條「斜率為 0」的水平線</div>
+      </div>
+      <button class="ba" type="button" data-go="1">複習好了，進入曲線探索（步驟 1）➔</button>
+    </div>
+
+    <!-- 步驟 1：任選曲線上的點 A -->
+    <div class="sc" id="s1" style="display:none">
+      <p>現在換成彎曲的函數圖形！請拉動下方滑桿，在曲線上任選一個基準點 <span class="ct">A(a, f(a))</span>（左圖可滾輪縮放或按住拖曳平移視野）：</p>
+      <div class="ci">
+        <label><span>定點 A(a, f(a))</span><span id="lA" class="ct c-pri">A(1.00, −1.00)</span></label>
+        <input type="range" id="sA" min="-4" max="4" step="0.05" value="1">
+      </div>
+      <div class="bg">
+        <button class="bs" type="button" data-go="0">回暖身</button>
+        <button class="ba" type="button" data-go="2">選好點 A 了，下一步 ➔</button>
+      </div>
+    </div>
+
+    <!-- 步驟 2：放大、放大、再放大（無綠色切線） -->
+    <div class="sc" id="s2" style="display:none">
+      <p>現在把點 <span class="ct">A</span> 附近<b>放大、放大、再放大</b>！可以直接在左圖滾動滑鼠滾輪，或點下方按鈕：</p>
+      <button class="ba" id="btnDeep" type="button">🔍 將點 A 放大 80 倍</button>
+      <div class="fb ok" id="zoomDone">
+        <b>👀 看看放大後的藍色曲線，是不是看起來很像一條直線？</b><br>
+        當我們把平滑曲線局部無限放大時，點 A 附近幾乎變成一條筆直的線！在數學上，我們先稱這條局部極度貼合曲線的直線叫做<b>「切線」</b>。
+      </div>
+      <div class="bg">
+        <button class="bs" type="button" data-go="1">上一步</button>
+        <button class="ba" id="n3" type="button" style="display:none" data-go="3">下一步 ➔</button>
+      </div>
+    </div>
+
+    <!-- 步驟 3：求切線還缺什麼？ -->
+    <div class="sc" id="s3" style="display:none">
+      <p><b>🤔 動腦想一想：</b>左圖綠線就是剛才微觀看到的切線。現在我們想求出這條直線的方程式，已經知道它通過點 <span class="ct">A(a, f(a))</span> 了，還缺什麼？</p>
+      <div>
+        <div class="qo" data-q="1" data-r="0">A. 多項式函數的最高次方</div>
+        <div class="qo" data-q="1" data-r="1">B. 斜率（或這條直線上的另一個點）</div>
+        <div class="qo" data-q="1" data-r="0">C. 坐標軸原點 (0, 0) 的位置</div>
+      </div>
+      <div class="fb" id="f1"></div>
+      <div class="bg">
+        <button class="bs" type="button" data-go="2">上一步</button>
+        <button class="ba" id="n4" type="button" style="display:none" data-go="4">下一步 ➔</button>
+      </div>
+    </div>
+
+    <!-- 步驟 4：鄰近點 P1、P2、P3 與割線逼近 -->
+    <div class="sc" id="s4" style="display:none">
+      <p>只有點 A 一個點，無法直接算斜率。如果我們在曲線上點 A 附近借三個點 <b style="color:#d97706">P<sub>1</sub></b>、<b style="color:#0284c7">P<sub>2</sub></b>、<b style="color:#7c3aed">P<sub>3</sub></b>，分別與 A 連成「割線」，請看下表並判斷哪一條的斜率<b>最接近綠色切線斜率</b>？</p>
+      <table class="cmp-tbl">
+        <thead>
+          <tr><th>割線</th><th>水平差 x − a</th><th>割線斜率</th></tr>
+        </thead>
+        <tbody id="cmpBody"></tbody>
+      </table>
+      <div>
+        <div class="qo" data-q="2" data-r="0">A. 距離較遠的 P<sub>1</sub> 與 A 的割線</div>
+        <div class="qo" data-q="2" data-r="0">B. 距離適中的 P<sub>2</sub> 與 A 的割線</div>
+        <div class="qo" data-q="2" data-r="1">C. 最靠近點 A 的 P<sub>3</sub> 與 A 的割線</div>
+      </div>
+      <div class="fb" id="f2"></div>
+      <div class="bg">
+        <button class="bs" type="button" data-go="3">上一步</button>
+        <button class="ba" id="n5" type="button" style="display:none" data-go="5">下一步：動點 P ➔</button>
+      </div>
+    </div>
+
+    <!-- 步驟 5：操作動點 P、0/0 困境與 lim 的必要性 -->
+    <div class="sc" id="s5" style="display:none">
+      <p><b>🎯 動手操作：</b>拉動滑桿移動紅色動點 <span class="ct c-bad">P(x, f(x))</span>，或使用微距按鈕讓 P 靠近 A，甚至試試看<b>完全重疊</b>！</p>
+      <div class="ci">
+        <label><span>動點 P(x, f(x))</span><span id="lP" class="ct c-bad">P(1.60, 0.90)</span></label>
+        <input type="range" id="sP" min="-4.5" max="4.5" step="0.001" value="1.6">
+      </div>
+      <div class="micro-row">
+        <button class="mbtn" type="button" data-dp="0.1">a + 0.1</button>
+        <button class="mbtn" type="button" data-dp="0.01">a + 0.01</button>
+        <button class="mbtn" type="button" data-dp="0.001">a + 0.001</button>
+        <button class="mbtn warn" type="button" data-dp="0">x = a (重疊試試！)</button>
+        <button class="mbtn" type="button" data-dp="-0.001">a − 0.001</button>
+      </div>
+      <button class="bs" id="btnApproach" type="button" style="border-color:var(--pri);color:var(--pri)">▶ 一鍵讓 P 逐步逼近 A</button>
+      <div class="stat">
+        <div class="row" style="justify-content:space-between">
+          <span>目前割線 AP 斜率：</span>
+          <span class="ct c-bad" id="mS">0</span>
+        </div>
+        <div class="row" style="justify-content:space-between">
+          <span>綠色切線真實斜率：</span>
+          <span class="ct c-ok" id="mT">0</span>
+        </div>
+      </div>
+      <div class="lim-hint" id="limHint">💡 小提示：試著點擊「x = a (重疊試試！)」把 P 與 A 重疊，觀察斜率算式會遇到什麼困境！</div>
+      <div class="lim-box" id="limBox">
+        <h4>💡 為什麼需要極限 (lim)？</h4>
+        <ol>
+          <li><b>0 / 0 困境：</b>直接代入 <b>x = a</b>（兩點重疊）會得到 <b>0 / 0</b>，分母為 0 沒有意義，而且一個點也連不出直線。</li>
+          <li><b>微距觀察：</b>切換比較上方的 <b>a + 0.001</b> 與 <b>a − 0.001</b>，只要讓 P <b>無限靠近 A 但永遠不重疊（x ≠ a）</b>，割線斜率就會穩定趨近切線真實斜率！</li>
+          <li><b>lim 的意義：</b>因此數學在割線斜率前加上 <b>lim (x → a)</b>，代表「讓 x 無限逼近 a，但 <b>x ≠ a</b>」，成功避開 0 / 0 又精準抓出切線斜率！</li>
+        </ol>
+      </div>
+      <div class="bg">
+        <button class="bs" type="button" data-go="4">上一步</button>
+        <button class="ba" type="button" data-go="6">了解極限的必要性，看結論 ➔</button>
+      </div>
+    </div>
+
+    <!-- 步驟 6：活動總結 -->
+    <div class="sc" id="s6" style="display:none">
+      <div class="def">
+        <h4>🎓 核心結論：切線與導數的定義</h4>
+        <p>為了找出通過 <b>A(a, f(a))</b> 的切線並避開 <b>0 / 0</b>，我們讓割線上的動點 <b>(x, f(x))</b> 無限逼近 <b>(a, f(a))</b>（且 <b>x ≠ a</b>）：</p>
+        <ul style="padding-left:20px;margin:8px 0">
+          <li>割線 AP 的極限位置，就是通過點 A 的<b>「切線」</b>。</li>
+          <li>割線斜率的極限值，就是切線斜率，定義為函數 f(x) 在 x = a 處的<b>導數</b>，記作 <b>f′(a)</b>。</li>
+        </ul>
+      </div>
+      <button class="ba" type="button" style="width:100%" data-go="0">🔄 重新探索（回暖身或換函數再試一次）</button>
+    </div>
+
+    <!-- 底部快速跳轉列 -->
+    <div class="jump-bar">
+      <span>快速跳轉：</span>
+      <span class="row" style="gap:4px">
+        <button class="tag active" type="button" data-go="0">暖身</button>
+        <button class="tag" type="button" data-go="1">1</button>
+        <button class="tag" type="button" data-go="2">2</button>
+        <button class="tag" type="button" data-go="3">3</button>
+        <button class="tag" type="button" data-go="4">4</button>
+        <button class="tag" type="button" data-go="5">5</button>
+        <button class="tag" type="button" data-go="6">6</button>
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- 右下角可收合浮動 AI 助教（林老師） -->
+<div class="ai-widget" id="aiWidget">
+  <!-- 收合時的提示氣泡 -->
+  <div class="ai-toast" id="aiToast">
+    <span id="aiToastText">👋 嗨！我是林老師，有任何數學問題隨時點我發問喔！</span>
+    <button class="ai-toast-close" id="aiToastClose" type="button" aria-label="關閉提示">✕</button>
+  </div>
+
+  <!-- 展開後的浮動對話視窗 -->
+  <div class="ai-panel" id="aiPanel" role="dialog" aria-label="林老師 AI 數學助教">
+    <div class="ai-head">
+      <div class="ai-head-info">
+        <div class="ai-head-av">
+          <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="80" cy="80" r="76" fill="#DBEAFE"/>
+            <path d="M34 150C38 118 55 108 80 108C105 108 122 118 126 150" fill="#1E3A8A"/>
+            <polygon points="80,108 66,150 94,150" fill="#FFFFFF"/>
+            <polygon points="80,114 75,150 85,150" fill="#EF4444"/>
+            <rect x="71" y="92" width="18" height="20" rx="6" fill="#FDE0C4"/>
+            <circle cx="80" cy="70" r="30" fill="#FFE4C8"/>
+            <path d="M48 68C46 42 62 32 82 32C102 32 114 44 112 68C108 54 96 46 80 46C64 46 52 54 48 68Z" fill="#334155"/>
+            <rect x="57" y="61" width="19" height="14" rx="4" stroke="#0F172A" stroke-width="3" fill="#FFFFFF" fill-opacity="0.45"/>
+            <rect x="84" y="61" width="19" height="14" rx="4" stroke="#0F172A" stroke-width="3" fill="#FFFFFF" fill-opacity="0.45"/>
+            <path d="M70 86Q80 94 90 86" stroke="#9A3412" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <div style="font-weight:800;font-size:0.94rem">林老師（AI 數學助教）</div>
+          <div style="font-size:0.75rem;opacity:0.92;display:flex;align-items:center;gap:4px">
+            <span class="online-dot"></span>隨時為你解答微積分觀念
+          </div>
+        </div>
+      </div>
+      <button class="ai-close" id="aiClose" type="button" title="收合視窗" aria-label="收合視窗">✕</button>
+    </div>
+
+    <div class="ai-hist" id="aiHist">
+      <div class="m t">
+        <div class="bub">👋 嗨！我是林老師。我們會從「直線斜率」一路探索到「切線與導數」！操作時隨時可以點下方快捷問題或打字問我喔。</div>
+      </div>
+    </div>
+
+    <div class="ai-chips">
+      <button class="chip" type="button" data-ask="斜率的正負方向代表什麼？">📐 斜率正負方向</button>
+      <button class="chip" type="button" data-ask="為什麼曲線放大後會變直線？">🔍 為什麼放大變直線</button>
+      <button class="chip" type="button" data-ask="幫我算目前點 A 的切線方程式">✏️ 目前點 A 切線方程式</button>
+      <button class="chip" type="button" data-ask="為什麼 P 跟 A 重疊會變 0/0？">⚠️ 為什麼重疊變 0/0</button>
+      <button class="chip" type="button" data-ask="極限符號 lim 的意義是什麼？">💡 lim 的意義是什麼</button>
+      <button class="chip" type="button" data-ask="割線跟切線到底差在哪裡？">📏 割線與切線差在哪</button>
+    </div>
+
+    <div class="ai-foot">
+      <input id="aiInput" type="text" placeholder="輸入你想問林老師的問題...">
+      <button id="aiSend" type="button">發問</button>
+    </div>
+  </div>
+
+  <!-- 收合狀態的浮動按鈕 -->
+  <button class="ai-fab" id="aiFab" type="button" aria-expanded="false">
+    <span class="unread-dot" id="unreadDot"></span>
+    <span class="ai-fab-av">
+      <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="80" cy="80" r="76" fill="#DBEAFE"/>
+        <path d="M34 150C38 118 55 108 80 108C105 108 122 118 126 150" fill="#1E3A8A"/>
+        <polygon points="80,108 66,150 94,150" fill="#FFFFFF"/>
+        <polygon points="80,114 75,150 85,150" fill="#EF4444"/>
+        <rect x="71" y="92" width="18" height="20" rx="6" fill="#FDE0C4"/>
+        <circle cx="80" cy="70" r="30" fill="#FFE4C8"/>
+        <path d="M48 68C46 42 62 32 82 32C102 32 114 44 112 68C108 54 96 46 80 46C64 46 52 54 48 68Z" fill="#334155"/>
+        <rect x="57" y="61" width="19" height="14" rx="4" stroke="#0F172A" stroke-width="3" fill="#FFFFFF" fill-opacity="0.45"/>
+        <rect x="84" y="61" width="19" height="14" rx="4" stroke="#0F172A" stroke-width="3" fill="#FFFFFF" fill-opacity="0.45"/>
+        <path d="M70 86Q80 94 90 86" stroke="#9A3412" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <span class="ai-fab-txt">
+      <strong>問林老師</strong>
+      <small><span class="online-dot"></span>AI 數學助教</small>
+    </span>
+  </button>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  const $ = id => document.getElementById(id);
+  const cv = $('cv');
+  const ctx = cv.getContext('2d');
+  const cbox = $('cbox');
+
+  // 核心狀態
+  let currentFn = x => x * x * x - 2 * x;
+  let step = 0; // 預設從步驟 0（暖身：複習直線斜率）開始
+  let zoom = 1.0;
+  let panX = 0;
+  let panY = 0;
+  let animId = null;
+
+  // 步驟 0：直線兩點 A、B 與小挑戰狀態
+  let ptA = { x: -1, y: -1 };
+  let ptB = { x: 2, y: 2 };
+  let dragTarget = null; // 'A' | 'B' | 'pan' | null
+  let dragStartX = 0;
+  let dragStartY = 0;
+  const doneChal = { pos: false, neg: false, zero: false };
+
+  // 步驟 5：是否曾觸發 0/0 重疊
+  let hasSeenZero = false;
+
+  // 右下角 AI 助教狀態
+  let aiOpen = false;
+  let toastTimer = null;
+
+  // 工具函式
+  const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+
+  function fmtFix(val, digits = 2) {
+    if (!Number.isFinite(val)) return '無定義';
+    const eps = 0.5 * Math.pow(10, -digits);
+    const clean = Math.abs(val) < eps ? 0 : val;
+    const str = clean.toFixed(digits);
+    return clean < 0 ? '−' + str.slice(1) : str;
+  }
+
+  function fmtSub(val, digits = 2) {
+    const s = fmtFix(val, digits);
+    return val < -0.5 * Math.pow(10, -digits) ? '(' + s + ')' : s;
+  }
+
+  const f = x => {
+    try {
+      const y = currentFn(x);
+      return Number.isFinite(y) ? y : NaN;
+    } catch {
+      return NaN;
+    }
+  };
+
+  const df = x => {
+    const h = 1e-6;
+    return (f(x + h) - f(x - h)) / (2 * h);
+  };
+
+  function stopAnim() {
+    if (animId !== null) {
+      cancelAnimationFrame(animId);
+      animId = null;
+    }
+  }
+
+  // =========================================================
+  // 安全遞迴下降數學解析器（不使用 eval / new Function）
+  // 支援：隱含乘法 (2x, 0.5x^3, 2(x+1)), 次方 ^, 括號, sin/cos/tan/sqrt/abs
+  // =========================================================
+  function compileExpr(raw) {
+    const s = raw
+      .trim()
+      .toLowerCase()
+      .replace(/－/g, '-')
+      .replace(/＋/g, '+')
+      .replace(/×/g, '*')
+      .replace(/÷/g, '/')
+      .replace(/\*\*/g, '^')
+      .replace(/\s+/g, '');
+
+    if (!s) throw new Error('empty');
+    const tokens = s.match(/\d*\.?\d+|[a-z]+|[-+*\/^()]/g);
+    if (!tokens || tokens.join('') !== s) throw new Error('invalid token');
+
+    let i = 0;
+    const funcs = {
+      sin: Math.sin,
+      cos: Math.cos,
+      tan: Math.tan,
+      sqrt: Math.sqrt,
+      abs: Math.abs
+    };
+    const peek = () => tokens[i];
+
+    function parseExpr() {
+      let left = parseTerm();
+      while (peek() === '+' || peek() === '-') {
+        const op = tokens[i++];
+        const right = parseTerm();
+        const l = left;
+        left = op === '+' ? x => l(x) + right(x) : x => l(x) - right(x);
+      }
+      return left;
+    }
+
+    function parseTerm() {
+      let left = parseUnary();
+      while (true) {
+        const p = peek();
+        if (p === '*' || p === '/') {
+          i++;
+          const right = parseUnary();
+          const l = left;
+          left = p === '*' ? x => l(x) * right(x) : x => l(x) / right(x);
+        } else if (p && (/^[\d.a-z]/.test(p) || p === '(')) {
+          // 隱含乘法：例如 2x, 0.5x^3, (x+1)(x-1), 2sin(x)
+          const right = parseUnary();
+          const l = left;
+          left = x => l(x) * right(x);
+        } else {
+          break;
+        }
+      }
+      return left;
+    }
+
+    function parseUnary() {
+      if (peek() === '-') {
+        i++;
+        const operand = parseUnary();
+        return x => -operand(x);
+      }
+      if (peek() === '+') {
+        i++;
+        return parseUnary();
+      }
+      return parsePower();
+    }
+
+    function parsePower() {
+      const base = parseAtom();
+      if (peek() === '^') {
+        i++;
+        const exp = parseUnary();
+        return x => Math.pow(base(x), exp(x));
+      }
+      return base;
+    }
+
+    function parseAtom() {
+      const tok = tokens[i++];
+      if (tok === undefined) throw new Error('unexpected end');
+      if (/^[\d.]/.test(tok)) {
+        const num = parseFloat(tok);
+        if (Number.isNaN(num)) throw new Error('nan');
+        return () => num;
+      }
+      if (tok === 'x') return x => x;
+      if (tok === 'pi') return () => Math.PI;
+      if (tok === 'e') return () => Math.E;
+      if (funcs[tok]) {
+        if (tokens[i++] !== '(') throw new Error('missing (');
+        const arg = parseExpr();
+        if (tokens[i++] !== ')') throw new Error('missing )');
+        const fn = funcs[tok];
+        return x => fn(arg(x));
+      }
+      if (tok === '(') {
+        const inner = parseExpr();
+        if (tokens[i++] !== ')') throw new Error('missing )');
+        return inner;
+      }
+      throw new Error('unknown token: ' + tok);
+    }
+
+    const compiled = parseExpr();
+    if (i < tokens.length) throw new Error('trailing tokens');
+
+    // 驗證至少在常見測試點中有合法數值
+    const sampleOk = [0, 1, -1, 0.5, 2].some(v => Number.isFinite(compiled(v)));
+    if (!sampleOk) throw new Error('not finite');
+    return compiled;
+  }
+
+  function prettyFnHTML(expr) {
+    const clean = expr
+      .trim()
+      .replace(/\*/g, '')
+      .replace(/\s*-\s*/g, ' − ')
+      .replace(/\s*\+\s*/g, ' + ')
+      .replace(/^\s*−\s*/, '−')
+      .replace(/\^(\d+)/g, '<sup>$1</sup>');
+    return 'f(x) = ' + esc(clean).replace(/&lt;sup&gt;(\d+)&lt;\/sup&gt;/g, '<sup>$1</sup>');
+  }
+
+  function updateHeaderSub() {
+    if (step === 0) {
+      $('subText').textContent = '暖身：複習直線的斜率';
+    } else {
+      $('subText').innerHTML = '目前探索函數：<b style="color:var(--pri)">' + prettyFnHTML($('fin').value) + '</b>';
+    }
+  }
+
+  function applyCustomFn() {
+    try {
+      currentFn = compileExpr($('fin').value);
+      $('ferr').style.display = 'none';
+      panX = 0;
+      panY = 0;
+      updateHeaderSub();
+      draw();
+      pushTeacherMsg('已切換成新函數 <b>' + prettyFnHTML($('fin').value) + '</b>！調整定點 A 並試著縮放觀察它的局部特徵吧。', false);
+    } catch {
+      $('ferr').style.display = 'block';
+    }
+  }
+
+  $('applyBtn').onclick = applyCustomFn;
+  $('fin').addEventListener('keydown', e => {
+    if (e.key === 'Enter') applyCustomFn();
+  });
+
+  // =========================================================
+  // 可展開／收合數學計算機鍵盤（支援游標處精準插入）
+  // =========================================================
+  $('calcToggle').onclick = () => {
+    const open = $('calcWrap').classList.toggle('open');
+    $('calcToggle').classList.toggle('open', open);
+    $('calcToggle').setAttribute('aria-expanded', String(open));
+    $('calcToggle').textContent = open ? '🧮 計算機鍵盤 ▴' : '🧮 計算機鍵盤 ▾';
+  };
+
+  function insertAtCursor(str) {
+    const inp = $('fin');
+    const start = inp.selectionStart ?? inp.value.length;
+    const end = inp.selectionEnd ?? inp.value.length;
+    inp.value = inp.value.slice(0, start) + str + inp.value.slice(end);
+    const pos = start + str.length;
+    inp.focus();
+    inp.setSelectionRange(pos, pos);
+  }
+
+  $('calcGrid').addEventListener('click', e => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    const inp = $('fin');
+    if (btn.dataset.ins !== undefined) {
+      insertAtCursor(btn.dataset.ins);
+    } else if (btn.dataset.act === 'bs') {
+      const start = inp.selectionStart ?? inp.value.length;
+      const end = inp.selectionEnd ?? inp.value.length;
+      if (start !== end) {
+        inp.value = inp.value.slice(0, start) + inp.value.slice(end);
+        inp.focus();
+        inp.setSelectionRange(start, start);
+      } else if (start > 0) {
+        inp.value = inp.value.slice(0, start - 1) + inp.value.slice(start);
+        inp.focus();
+        inp.setSelectionRange(start - 1, start - 1);
+      } else {
+        inp.focus();
+      }
+    } else if (btn.dataset.act === 'clr') {
+      inp.value = '';
+      inp.focus();
+    } else if (btn.dataset.act === 'apply') {
+      applyCustomFn();
+    }
+  });
+
+  // 課本範例快速切換
+  document.querySelectorAll('[data-preset]').forEach(btn => {
+    btn.onclick = () => {
+      const a = parseFloat(btn.dataset.a);
+      $('fin').value = btn.dataset.preset;
+      $('sA').value = a;
+      $('sP').value = (a + 0.6 <= 4.4 ? a + 0.6 : a - 0.6).toFixed(3);
+      applyCustomFn();
+    };
+  });
+
+  // 步驟 0 快速範例
+  document.querySelectorAll('[data-ab]').forEach(btn => {
+    btn.onclick = () => {
+      const [ax, ay, bx, by] = btn.dataset.ab.split(',').map(Number);
+      ptA = { x: ax, y: ay };
+      ptB = { x: bx, y: by };
+      draw();
+    };
+  });
+
+  // =========================================================
+  // 步驟切換管理
+  // =========================================================
+  const stepTitles = [
+    '暖身：複習直線的斜率',
+    '步驟 1：任選曲線上的點 A',
+    '步驟 2：放大、放大、再放大',
+    '步驟 3：求切線還缺什麼條件？',
+    '步驟 4：鄰近點與割線逼近',
+    '步驟 5：動點 P 逼近與 lim 的必要性',
+    '步驟 6：活動總結與導數定義'
+  ];
+
+  function goToStep(n) {
+    stopAnim();
+    step = n;
+    for (let i = 0; i <= 6; i++) {
+      $('s' + i).style.display = i === n ? 'flex' : 'none';
+    }
+    $('stepTitle').textContent = stepTitles[n];
+    $('stepCount').textContent = n + ' / 6';
+
+    $('fbar').style.display = n === 0 ? 'none' : 'flex';
+    $('ztools').style.display = n === 0 ? 'none' : 'flex';
+
+    document.querySelectorAll('.jump-bar .tag').forEach(b => {
+      b.classList.toggle('active', Number(b.dataset.go) === n);
+    });
+
+    panX = 0;
+    panY = 0;
+    const ax = parseFloat($('sA').value);
+
+    if (n === 0) {
+      zoom = 1.0;
+      showToast('先拖曳 A、B 兩點複習直線斜率，完成小挑戰再進入曲線喔！');
+    } else if (n === 1) {
+      zoom = 1.0;
+      showToast('拉動滑桿在曲線上任選一個點 A，準備開始微觀觀察！');
+    } else if (n === 2) {
+      zoom = 1.0;
+      $('zoomDone').style.display = 'none';
+      $('n3').style.display = 'none';
+      showToast('點擊「放大 80 倍」或滾動滾輪，單純觀察藍色曲線放大後的樣子！');
+    } else if (n === 3) {
+      zoom = 1.8;
+      showToast('綠線就是剛才看到的切線！想一想，要求這條直線還缺什麼？');
+    } else if (n === 4) {
+      zoom = 1.8;
+      showToast('對照表格中 P₁、P₂、P₃ 的割線斜率，哪一條最接近綠色切線？');
+    } else if (n === 5) {
+      zoom = 2.4;
+      $('sP').value = (ax + 0.6 <= 4.4 ? ax + 0.6 : ax - 0.6).toFixed(3);
+      showToast('試著點「x = a (重疊試試！)」看看會發生什麼事，再比較 a ± 0.001！');
+    } else if (n === 6) {
+      zoom = 1.6;
+      showToast('🎉 完成探究！讓割線的 (x, f(x)) 無限逼近 (a, f(a))，就得到切線與導數！');
+    }
+
+    updateHeaderSub();
+    resizeCanvas();
+  }
+
+  document.querySelectorAll('[data-go]').forEach(btn => {
+    btn.onclick = () => goToStep(Number(btn.dataset.go));
+  });
+
+  // 步驟 2：放大 80 倍動畫
+  $('btnDeep').onclick = () => {
+    stopAnim();
+    panX = 0;
+    panY = 0;
+    function animZoom() {
+      if (zoom < 79.6) {
+        zoom += (80 - zoom) * 0.14;
+        draw();
+        animId = requestAnimationFrame(animZoom);
+      } else {
+        zoom = 80;
+        animId = null;
+        unlockStep2();
+        draw();
+      }
+    }
+    animZoom();
+  };
+
+  function unlockStep2() {
+    if (step === 2 && zoom >= 25) {
+      $('zoomDone').style.display = 'block';
+      $('n3').style.display = 'block';
+    }
+  }
+
+  // 步驟 3 與 步驟 4 單選題
+  document.querySelectorAll('.qo').forEach(opt => {
+    opt.onclick = () => {
+      const q = opt.dataset.q;
+      const isRight = opt.dataset.r === '1';
+      const parentId = q === '1' ? 's3' : 's4';
+      document.querySelectorAll('#' + parentId + ' .qo').forEach(el => el.classList.remove('sel'));
+      opt.classList.add('sel');
+      const fb = $('f' + q);
+      if (isRight) {
+        fb.className = 'fb ok';
+        fb.innerHTML = q === '1'
+          ? '🎯 <b>完全正確！</b>已知直線通過點 A(a, f(a))，只要再求出「斜率」（或直線上另一個點），就能用點斜式寫出這條切線！'
+          : '🎯 <b>答對了！</b>點 P<sub>3</sub> 最靠近點 A，它與 A 連成的割線斜率最接近綠色切線的真實斜率！';
+        $(q === '1' ? 'n4' : 'n5').style.display = 'block';
+      } else {
+        fb.className = 'fb no';
+        fb.innerHTML = q === '1'
+          ? '❌ 再想一下喔！有了直線通過的一點 A，還需要什麼才能決定這條直線的傾斜方向？'
+          : '❌ 對照上方表格與左圖：距離點 A 越遠的點，割線是不是偏離綠色切線越多呢？';
+      }
+    };
+  });
+
+  // 步驟 5：微距試探按鈕
+  document.querySelectorAll('[data-dp]').forEach(btn => {
+    btn.onclick = () => {
+      stopAnim();
+      const ax = parseFloat($('sA').value);
+      const dp = parseFloat(btn.dataset.dp);
+      const nextP = Math.max(-4.5, Math.min(4.5, ax + dp));
+      $('sP').value = nextP.toFixed(3);
+      if (dp === 0) {
+        showToast('⚠️ 出現 0 / 0 無意義！快點「a + 0.001」比較，感受 lim (x → a) 的必要性！');
+      }
+      draw();
+    };
+  });
+
+  // 步驟 5：一鍵逐步逼近動畫
+  $('btnApproach').onclick = () => {
+    stopAnim();
+    const ax = parseFloat($('sA').value);
+    let curP = parseFloat($('sP').value);
+    if (Math.abs(curP - ax) < 0.08) {
+      curP = ax + 0.7 <= 4.4 ? ax + 0.7 : ax - 0.7;
+      $('sP').value = curP.toFixed(3);
+      draw();
+    }
+    const target = curP > ax ? ax + 0.001 : ax - 0.001;
+    function tick() {
+      const p = parseFloat($('sP').value);
+      const diff = target - p;
+      if (Math.abs(diff) > 0.002) {
+        $('sP').value = (p + diff * 0.08).toFixed(3);
+        draw();
+        animId = requestAnimationFrame(tick);
+      } else {
+        $('sP').value = target.toFixed(3);
+        animId = null;
+        draw();
+      }
+    }
+    tick();
+  };
+
+  // =========================================================
+  // 畫布縮放與拖曳互動（步驟 0 拖曳 A/B；步驟 1～6 拖曳平移、滾輪縮放，點擊絕不改點 A）
+  // =========================================================
+  function zoomBy(factor) {
+    if (step === 0) return;
+    stopAnim();
+    zoom = Math.min(150, Math.max(0.1, zoom * factor));
+    unlockStep2();
+    draw();
+  }
+
+  $('zin').onclick = () => zoomBy(1.3);
+  $('zout').onclick = () => zoomBy(0.75);
+
+  cv.addEventListener('wheel', e => {
+    if (step === 0) return;
+    e.preventDefault();
+    zoomBy(e.deltaY < 0 ? 1.15 : 0.85);
+  }, { passive: false });
+
+  function getStep0View(W, H) {
+    const u = Math.min(W, H) / 10;
+    const ox = W / 2;
+    const oy = H / 2;
+    return {
+      u,
+      ox,
+      oy,
+      X: x => ox + x * u,
+      Y: y => oy - y * u,
+      MX: sx => (sx - ox) / u,
+      MY: sy => (oy - sy) / u
+    };
+  }
+
+  cv.addEventListener('pointerdown', e => {
+    const rect = cv.getBoundingClientRect();
+    const cx = e.clientX - rect.left;
+    const cy = e.clientY - rect.top;
+
+    if (step === 0) {
+      const v = getStep0View(cbox.clientWidth, cbox.clientHeight);
+      const dA = Math.hypot(cx - v.X(ptA.x), cy - v.Y(ptA.y));
+      const dB = Math.hypot(cx - v.X(ptB.x), cy - v.Y(ptB.y));
+      if (dA <= 26 || dB <= 26) {
+        dragTarget = dA <= dB ? 'A' : 'B';
+        cv.setPointerCapture(e.pointerId);
+      }
+    } else {
+      dragTarget = 'pan';
+      dragStartX = e.clientX - panX;
+      dragStartY = e.clientY - panY;
+      cv.setPointerCapture(e.pointerId);
+    }
+  });
+
+  cv.addEventListener('pointermove', e => {
+    if (!dragTarget) return;
+    if (step === 0 && (dragTarget === 'A' || dragTarget === 'B')) {
+      const rect = cv.getBoundingClientRect();
+      const cx = e.clientX - rect.left;
+      const cy = e.clientY - rect.top;
+      const v = getStep0View(cbox.clientWidth, cbox.clientHeight);
+      const snap = val => Math.max(-5, Math.min(5, Math.round(val * 2) / 2));
+      const nx = snap(v.MX(cx));
+      const ny = snap(v.MY(cy));
+      if (dragTarget === 'A') {
+        ptA.x = nx;
+        ptA.y = ny;
+      } else {
+        ptB.x = nx;
+        ptB.y = ny;
+      }
+      draw();
+    } else if (dragTarget === 'pan') {
+      panX = e.clientX - dragStartX;
+      panY = e.clientY - dragStartY;
+      draw();
+    }
+  });
+
+  cv.addEventListener('pointerup', () => {
+    dragTarget = null;
+  });
+  cv.addEventListener('pointercancel', () => {
+    dragTarget = null;
+  });
+
+  $('sA').addEventListener('input', () => {
+    panX = 0;
+    panY = 0;
+    draw();
+  });
+  $('sP').addEventListener('input', draw);
+
+  // =========================================================
+  // 持續顯示的「📐 斜率計算式演進」卡片更新
+  // =========================================================
+  function updateEvoCard() {
+    const stage = $('evoStage');
+    const fm = $('evoFormula');
+    const note = $('evoNote');
+
+    if (step === 0) {
+      stage.textContent = '兩點斜率公式';
+      const dx = ptB.x - ptA.x;
+      const dy = ptB.y - ptA.y;
+      const numStr = fmtFix(ptB.y, 1) + ' − ' + fmtSub(ptA.y, 1);
+      const denStr = fmtFix(ptB.x, 1) + ' − ' + fmtSub(ptA.x, 1);
+
+      if (Math.abs(dx) < 1e-9 && Math.abs(dy) < 1e-9) {
+        fm.innerHTML = '<span>m ＝</span><div class="fr"><span class="c-dy">y<sub>2</sub> − y<sub>1</sub></span><span class="c-dx">x<sub>2</sub> − x<sub>1</sub></span></div><span>＝</span><span class="zero-warn">兩點重疊（0 / 0）</span>';
+        note.innerHTML = 'A 與 B 目前重疊在同一點，無法決定一條直線喔！請把其中一點拉開。';
+      } else if (Math.abs(dx) < 1e-9) {
+        fm.innerHTML = '<span>m ＝</span><div class="fr"><span class="c-dy">y<sub>2</sub> − y<sub>1</sub></span><span class="c-dx">x<sub>2</sub> − x<sub>1</sub></span></div><span>＝</span><div class="fr"><span class="c-dy">' + fmtFix(dy, 1) + '</span><span class="c-bad">0</span></div><span class="zero-warn">無意義（分母為 0）</span>';
+        note.innerHTML = '這是<b>鉛直線</b>，水平位移 Δx = 0，分母為 0 所以沒有斜率。';
+      } else {
+        const m = dy / dx;
+        fm.innerHTML = '<span>m ＝</span><div class="fr"><span class="c-dy">y<sub>2</sub> − y<sub>1</sub></span><span class="c-dx">x<sub>2</sub> − x<sub>1</sub></span></div><span>＝</span><div class="fr"><span class="c-dy">' + numStr + '</span><span class="c-dx">' + denStr + '</span></div><span>＝ <b class="c-pri">' + fmtFix(m, 2) + '</b></span>';
+        note.innerHTML = '水平增加 Δx = <b class="c-dx">' + fmtFix(dx, 1) + '</b>，鉛直變化 Δy = <b class="c-dy">' + fmtFix(dy, 1) + '</b>，比值就是斜率 <b>' + fmtFix(m, 2) + '</b>。';
+      }
+      return;
+    }
+
+    const ax = parseFloat($('sA').value);
+    const ay = f(ax);
+    const mt = df(ax);
+    const aStr = fmtFix(ax, 2);
+    const faStr = fmtFix(ay, 2);
+
+    if (step === 1 || step === 2) {
+      stage.textContent = '代入基準點 A(a, f(a))';
+      fm.innerHTML = '<span>m ＝</span><div class="fr"><span class="c-dy">y<sub>2</sub> − f(a)</span><span class="c-dx">x<sub>2</sub> − a</span></div><span>，A(' + aStr + ', ' + faStr + ')</span>';
+      note.innerHTML = step === 1
+        ? '目前選定點 <b>A(' + aStr + ', ' + faStr + ')</b>，也就是公式裡的 <b>(a, f(a))</b>。'
+        : '放大 80 倍後，點 <b>A(' + aStr + ', ' + faStr + ')</b> 附近看起來幾乎是一條筆直的線！';
+    } else if (step === 3) {
+      stage.textContent = '缺少第二個點！';
+      fm.innerHTML = '<span>m ＝</span><div class="fr"><span class="c-dy"><b class="c-bad">?</b> − f(a)</span><span class="c-dx"><b class="c-bad">?</b> − a</span></div>';
+      note.innerHTML = '我們只知道切線通過 <b>A(' + aStr + ', ' + faStr + ')</b>，算式裡還少了第二個點 <b class="c-bad">(?, ?)</b>！';
+    } else if (step === 4) {
+      stage.textContent = '割線斜率一般式';
+      fm.innerHTML = '<span>m<sub>割線</sub> ＝</span><div class="fr"><span class="c-dy">f(x) − f(a)</span><span class="c-dx">x − a</span></div>';
+      note.innerHTML = '借用曲線上鄰近點 <b>(x, f(x))</b> 與 <b>A(a, f(a))</b> 連成割線，就能用這個式子算出割線斜率！';
+    } else if (step === 5) {
+      const px = parseFloat($('sP').value);
+      const py = f(px);
+      const dx = px - ax;
+      const dy = py - ay;
+      if (Math.abs(dx) < 1e-5) {
+        stage.textContent = '⚠️ 遭遇 0 / 0 困境！';
+        fm.innerHTML = '<span>m ＝</span><div class="fr"><span class="c-dy">f(a) − f(a)</span><span class="c-dx">a − a</span></div><span>＝</span><div class="fr"><span class="c-bad">0</span><span class="c-bad">0</span></div><span class="zero-warn">無意義！（分母為 0，無法計算）</span>';
+        note.innerHTML = '當 P 與 A 重疊（<b>x = a</b>）時，分母為 0 無法計算！快試著點下方 <b>a + 0.001</b> 或 <b>a − 0.001</b>，感受為何需要 <b>lim</b>！';
+      } else {
+        stage.textContent = '動點 (x, f(x)) 即時代入（x ≠ a）';
+        const ms = dy / dx;
+        const d = Math.abs(dx) < 0.05 ? 3 : 2;
+        fm.innerHTML = '<span>m ＝</span><div class="fr"><span class="c-dy">f(x) − f(a)</span><span class="c-dx">x − a</span></div><span>＝</span><div class="fr"><span class="c-dy">' + fmtFix(py, d) + ' − ' + fmtSub(ay, d) + '</span><span class="c-dx">' + fmtFix(px, d) + ' − ' + fmtSub(ax, d) + '</span></div><span>＝ <b class="c-bad">' + fmtFix(ms, 3) + '</b></span>';
+        note.innerHTML = '目前 <b>x ≠ a</b>（x − a = ' + fmtFix(dx, 3) + '），割線斜率 <b>' + fmtFix(ms, 3) + '</b> 正逼近切線斜率 <b class="c-ok">' + fmtFix(mt, 3) + '</b>！';
+      }
+    } else if (step === 6) {
+      stage.textContent = '導數與切線斜率定義';
+      fm.innerHTML = '<span>f′(a) ＝</span><div class="lim"><span>lim</span><small>x → a</small></div><div class="fr"><span class="c-dy">f(x) − f(a)</span><span class="c-dx">x − a</span></div>';
+      note.innerHTML = '讓割線上的 <b>(x, f(x))</b> 無限逼近 <b>(a, f(a))</b>（x ≠ a）；在 A(' + aStr + ', ' + faStr + ') 處，f′(' + aStr + ') ＝ <b class="c-ok">' + fmtFix(mt, 3) + '</b>。';
+    }
+  }
+
+  // =========================================================
+  // 繪製直角三角形（Δx 橘色、Δy 紫色、直角記號）
+  // =========================================================
+  function drawRightTriangle(X, Y, x1, y1, x2, y2, dxLabel, dyLabel) {
+    const sx1 = X(x1), sy1 = Y(y1);
+    const sx2 = X(x2), sy2 = Y(y2);
+    const cx = sx2, cy = sy1; // 直角頂點 (x2, y1)
+
+    // 水平線 Δx（橘色）
+    ctx.strokeStyle = '#ea580c';
+    ctx.lineWidth = 2.5;
+    ctx.setLineDash([5, 4]);
+    ctx.beginPath();
+    ctx.moveTo(sx1, sy1);
+    ctx.lineTo(cx, cy);
+    ctx.stroke();
+
+    // 鉛直線 Δy（紫色）
+    ctx.strokeStyle = '#7c3aed';
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(sx2, sy2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // 直角符號
+    const absDx = Math.abs(cx - sx1);
+    const absDy = Math.abs(sy2 - cy);
+    if (absDx > 16 && absDy > 16) {
+      const sz = 10;
+      const dirX = sx1 > cx ? 1 : -1;
+      const dirY = sy2 > cy ? 1 : -1;
+      ctx.strokeStyle = css('--axis');
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.moveTo(cx + dirX * sz, cy);
+      ctx.lineTo(cx + dirX * sz, cy + dirY * sz);
+      ctx.lineTo(cx, cy + dirY * sz);
+      ctx.stroke();
+    }
+
+    // 標示文字
+    ctx.font = 'bold 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    if (absDx > 24) {
+      ctx.fillStyle = '#ea580c';
+      const ly = sy2 < cy ? cy + 16 : cy - 8;
+      ctx.fillText(dxLabel, (sx1 + cx) / 2 - 24, ly);
+    }
+    if (absDy > 20) {
+      ctx.fillStyle = '#7c3aed';
+      const lx = sx1 < cx ? cx + 8 : cx - 88;
+      ctx.fillText(dyLabel, lx, (cy + sy2) / 2 + 4);
+    }
+  }
+
+  // =========================================================
+  // 主繪圖函式
+  // =========================================================
+  function resizeCanvas() {
+    const dpr = window.devicePixelRatio || 1;
+    const W = cbox.clientWidth;
+    const H = cbox.clientHeight;
+    if (!W || !H) return;
+    cv.width = Math.round(W * dpr);
+    cv.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+
+  window.addEventListener('resize', resizeCanvas);
+  if (typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(resizeCanvas).observe(cbox);
+  }
+
+  function draw() {
+    const W = cbox.clientWidth;
+    const H = cbox.clientHeight;
+    if (!W || !H) return;
+    ctx.clearRect(0, 0, W, H);
+
+    if (step === 0) {
+      drawStep0(W, H);
+    } else {
+      drawCurveSteps(W, H);
+    }
+    updateEvoCard();
+  }
+
+  function drawStep0(W, H) {
+    const v = getStep0View(W, H);
+    const { X, Y } = v;
+    const ink = css('--ink');
+
+    // 網格（間距 1 單位）
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = css('--grid');
+    for (let x = -6; x <= 6; x++) {
+      ctx.beginPath(); ctx.moveTo(X(x), 0); ctx.lineTo(X(x), H); ctx.stroke();
+    }
+    for (let y = -6; y <= 6; y++) {
+      ctx.beginPath(); ctx.moveTo(0, Y(y)); ctx.lineTo(W, Y(y)); ctx.stroke();
+    }
+
+    // 坐標軸與刻度
+    ctx.strokeStyle = css('--axis');
+    ctx.lineWidth = 1.8;
+    ctx.beginPath(); ctx.moveTo(0, Y(0)); ctx.lineTo(W, Y(0)); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(X(0), 0); ctx.lineTo(X(0), H); ctx.stroke();
+
+    ctx.fillStyle = css('--mut');
+    ctx.font = 'bold 11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    for (let k = -5; k <= 5; k++) {
+      if (k === 0) continue;
+      ctx.fillText(fmtFix(k, 0), X(k) - 6, Y(0) + 14);
+      ctx.fillText(fmtFix(k, 0), X(0) + 6, Y(k) + 4);
+    }
+
+    const dx = ptB.x - ptA.x;
+    const dy = ptB.y - ptA.y;
+
+    // 繪製通過 A、B 的直線
+    if (Math.abs(dx) > 1e-9 || Math.abs(dy) > 1e-9) {
+      ctx.strokeStyle = '#2563eb';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      if (Math.abs(dx) < 1e-9) {
+        ctx.moveTo(X(ptA.x), 0);
+        ctx.lineTo(X(ptA.x), H);
+      } else {
+        const m = dy / dx;
+        const xL = v.MX(0), xR = v.MX(W);
+        ctx.moveTo(0, Y(ptA.y + m * (xL - ptA.x)));
+        ctx.lineTo(W, Y(ptA.y + m * (xR - ptA.x)));
+      }
+      ctx.stroke();
+
+      // 直角三角形
+      if (Math.abs(dx) > 1e-9 && Math.abs(dy) > 1e-9) {
+        drawRightTriangle(X, Y, ptA.x, ptA.y, ptB.x, ptB.y, 'Δx = ' + fmtFix(dx, 1), 'Δy = ' + fmtFix(dy, 1));
+      }
+    }
+
+    // 繪製可拖曳點 A 與 B
+    [
+      { p: ptA, name: 'A', color: '#2563eb', offsetY: -14 },
+      { p: ptB, name: 'B', color: '#dc2626', offsetY: 22 }
+    ].forEach(item => {
+      const sx = X(item.p.x), sy = Y(item.p.y);
+      ctx.fillStyle = item.color === '#2563eb' ? 'rgba(37, 99, 235, 0.18)' : 'rgba(220, 38, 38, 0.18)';
+      ctx.beginPath(); ctx.arc(sx, sy, 14, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = item.color;
+      ctx.beginPath(); ctx.arc(sx, sy, 7, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.fillStyle = ink;
+      ctx.font = 'bold 13px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+      ctx.fillText(item.name + '(' + fmtFix(item.p.x, 1) + ', ' + fmtFix(item.p.y, 1) + ')', sx + 10, sy + item.offsetY);
+    });
+
+    // 更新直覺提示與小挑戰
+    const st = $('slopeStatus');
+    if (Math.abs(dx) < 1e-9 && Math.abs(dy) < 1e-9) {
+      st.textContent = '⚠️ A、B 兩點重疊，無法形成直線';
+    } else if (Math.abs(dx) < 1e-9) {
+      st.textContent = '↕ 鉛直線：水平位移為 0，無斜率（分母為 0）';
+    } else if (Math.abs(dy) < 1e-9) {
+      st.textContent = '↔ 水平線：高度不變，斜率為 0';
+      doneChal.zero = true;
+    } else if (dy / dx > 0) {
+      st.textContent = '↗ 往右上傾斜：斜率為正（m = ' + fmtFix(dy / dx, 2) + '）';
+      doneChal.pos = true;
+    } else {
+      st.textContent = '↘ 往右下傾斜：斜率為負（m = ' + fmtFix(dy / dx, 2) + '）';
+      doneChal.neg = true;
+    }
+
+    $('chPos').className = 'chal-item' + (doneChal.pos ? ' done' : '');
+    $('chPos').textContent = (doneChal.pos ? '✅' : '⬜') + ' 做出一條「正斜率」直線（往右上）';
+    $('chNeg').className = 'chal-item' + (doneChal.neg ? ' done' : '');
+    $('chNeg').textContent = (doneChal.neg ? '✅' : '⬜') + ' 做出一條「負斜率」直線（往右下）';
+    $('chZero').className = 'chal-item' + (doneChal.zero ? ' done' : '');
+    $('chZero').textContent = (doneChal.zero ? '✅' : '⬜') + ' 做出一條「斜率為 0」的水平線';
+
+    $('hud').textContent = '直接拖曳 A、B 兩點觀察斜率變化';
+  }
+
+  function drawCurveSteps(W, H) {
+    const ax = parseFloat($('sA').value);
+    const ay = f(ax);
+    const px = parseFloat($('sP').value);
+    const py = f(px);
+    const ink = css('--ink');
+
+    const pDig = (step >= 5 && Math.abs(px - ax) > 0 && Math.abs(px - ax) < 0.05) ? 3 : 2;
+    $('lA').textContent = 'A(' + fmtFix(ax, 2) + ', ' + fmtFix(ay, 2) + ')';
+    $('lP').textContent = 'P(' + fmtFix(px, pDig) + ', ' + fmtFix(py, pDig) + ')';
+
+    const u = (W / 5) * zoom;
+    const ox = W / 2 - ax * u + panX;
+    const oy = H / 2 + ay * u + panY;
+
+    const X = x => ox + x * u;
+    const Y = y => oy - y * u;
+    const MX = sx => (sx - ox) / u;
+    const MY = sy => (oy - sy) / u;
+
+    // 1. 動態格線間距（0.1x ~ 150x 皆不擁擠）
+    let g = 0.5;
+    if (zoom > 40) g = 0.02;
+    else if (zoom > 15) g = 0.05;
+    else if (zoom > 6) g = 0.1;
+    else if (zoom > 2.5) g = 0.25;
+    else if (zoom >= 0.8) g = 0.5;
+    else if (zoom >= 0.35) g = 1.0;
+    else if (zoom >= 0.18) g = 2.0;
+    else g = 5.0;
+
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = css('--grid');
+    const minX = MX(0), maxX = MX(W);
+    const minY = MY(H), maxY = MY(0);
+
+    for (let x = Math.floor(minX / g) * g; x <= maxX; x += g) {
+      ctx.beginPath(); ctx.moveTo(X(x), 0); ctx.lineTo(X(x), H); ctx.stroke();
+    }
+    for (let y = Math.floor(minY / g) * g; y <= maxY; y += g) {
+      ctx.beginPath(); ctx.moveTo(0, Y(y)); ctx.lineTo(W, Y(y)); ctx.stroke();
+    }
+
+    // 2. 坐標軸
+    ctx.strokeStyle = css('--axis');
+    ctx.lineWidth = 1.6;
+    const ay0 = Y(0), ax0 = X(0);
+    if (ay0 >= 0 && ay0 <= H) {
+      ctx.beginPath(); ctx.moveTo(0, ay0); ctx.lineTo(W, ay0); ctx.stroke();
+    }
+    if (ax0 >= 0 && ax0 <= W) {
+      ctx.beginPath(); ctx.moveTo(ax0, 0); ctx.lineTo(ax0, H); ctx.stroke();
+    }
+
+    // 3. 函數曲線 f(x)（藍色）
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#3b82f6';
+    ctx.beginPath();
+    let penDown = false;
+    for (let sx = 0; sx <= W; sx += 2) {
+      const my = f(MX(sx));
+      if (!Number.isFinite(my) || Math.abs(Y(my)) > H * 4) {
+        penDown = false;
+        continue;
+      }
+      if (!penDown) {
+        ctx.moveTo(sx, Y(my));
+        penDown = true;
+      } else {
+        ctx.lineTo(sx, Y(my));
+      }
+    }
+    ctx.stroke();
+
+    const drawLine = (m, color, width, dash) => {
+      if (!Number.isFinite(m)) return;
+      ctx.lineWidth = width;
+      ctx.strokeStyle = color;
+      ctx.setLineDash(dash);
+      ctx.beginPath();
+      ctx.moveTo(0, Y(ay + m * (MX(0) - ax)));
+      ctx.lineTo(W, Y(ay + m * (MX(W) - ax)));
+      ctx.stroke();
+      ctx.setLineDash([]);
+    };
+
+    const mt = df(ax);
+
+    // 4. 綠色切線：嚴格僅在步驟 3 以上顯示（步驟 2 不可繪製）
+    if (step >= 3) {
+      drawLine(mt, '#16a34a', 2.2, []);
+    }
+
+    // 5. 步驟 4：鄰近點 P1、P2、P3 與對照小表格
+    ctx.font = 'bold 13px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    if (step === 4) {
+      const dir = ax > 1.2 ? -1 : 1;
+      const pts = [
+        { d: 0.7 * dir, col: '#d97706', label: 'P₁', sub: 'P<sub>1</sub>' },
+        { d: 0.35 * dir, col: '#0284c7', label: 'P₂', sub: 'P<sub>2</sub>' },
+        { d: 0.12 * dir, col: '#7c3aed', label: 'P₃', sub: 'P<sub>3</sub>' }
+      ];
+      let rowsHTML = '';
+      pts.forEach(item => {
+        const tx = ax + item.d;
+        const ty = f(tx);
+        const ms = (ty - ay) / item.d;
+        drawLine(ms, item.col, 1.8, [4, 4]);
+        ctx.fillStyle = item.col;
+        ctx.beginPath(); ctx.arc(X(tx), Y(ty), 5.5, 0, Math.PI * 2); ctx.fill();
+        ctx.fillText(item.label + '(' + fmtFix(tx, 2) + ', ' + fmtFix(ty, 2) + ')', X(tx) + 8, Y(ty) - 6);
+        rowsHTML += '<tr><td style="color:' + item.col + ';font-weight:800">' + item.sub + 'A</td><td>' + fmtFix(item.d, 2) + '</td><td><b>' + fmtFix(ms, 3) + '</b></td></tr>';
+      });
+      rowsHTML += '<tr style="background:var(--ok-bg);color:var(--ok-tx)"><td style="font-weight:800">綠色切線</td><td>逼近 0</td><td><b>' + fmtFix(mt, 3) + '</b></td></tr>';
+      $('cmpBody').innerHTML = rowsHTML;
+    }
+
+    // 6. 步驟 5、6：動點 P、割線 AP、直角三角形與 0/0 警示
+    if (step >= 5) {
+      const dx = px - ax;
+      const dy = py - ay;
+      const isOverlap = Math.abs(dx) < 1e-5;
+      $('mT').textContent = fmtFix(mt, 3);
+
+      if (isOverlap) {
+        hasSeenZero = true;
+        $('mS').innerHTML = '<span class="c-bad">0 / 0（無意義）</span>';
+        $('limBox').classList.add('show');
+        $('limHint').style.display = 'none';
+
+        const sxA = X(ax), syA = Y(ay);
+        ctx.fillStyle = 'rgba(220, 38, 38, 0.18)';
+        ctx.beginPath(); ctx.arc(sxA, syA, 22, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#dc2626';
+        ctx.lineWidth = 2.5;
+        ctx.setLineDash([4, 3]);
+        ctx.beginPath(); ctx.arc(sxA, syA, 15, 0, Math.PI * 2); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#dc2626';
+        ctx.fillText('⚠️ 0/0 無法計算！', sxA + 18, syA + 18);
+      } else {
+        const ms = dy / dx;
+        $('mS').textContent = fmtFix(ms, 3);
+        if (hasSeenZero) {
+          $('limBox').classList.add('show');
+          $('limHint').style.display = 'none';
+        } else {
+          $('limHint').style.display = 'block';
+        }
+
+        if (step === 5) {
+          drawRightTriangle(X, Y, ax, ay, px, py, 'x − a = ' + fmtFix(dx, pDig), 'f(x) − f(a) = ' + fmtFix(dy, pDig));
+        }
+        drawLine(ms, '#dc2626', 2.2, [5, 4]);
+        ctx.fillStyle = '#dc2626';
+        ctx.beginPath(); ctx.arc(X(px), Y(py), 5.5, 0, Math.PI * 2); ctx.fill();
+        ctx.fillText('P(' + fmtFix(px, pDig) + ', ' + fmtFix(py, pDig) + ')', X(px) + 8, Y(py) + 16);
+      }
+    }
+
+    // 7. 定點 A（正體字標示）
+    ctx.fillStyle = ink;
+    ctx.beginPath(); ctx.arc(X(ax), Y(ay), 6, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = css('--card');
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.fillStyle = ink;
+    ctx.font = 'bold 14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    ctx.fillText('A(' + fmtFix(ax, 2) + ', ' + fmtFix(ay, 2) + ')', X(ax) + 10, Y(ay) - 10);
+
+    const zStr = zoom < 1 ? zoom.toFixed(2) : zoom.toFixed(1);
+    $('hud').textContent = '放大倍率：' + zStr + ' 倍（0.1x～150x，滾輪縮放／拖曳平移）';
+  }
+
+  // =========================================================
+  // 右下角可收合浮動 AI 助教（林老師，100% 本地智慧回覆）
+  // =========================================================
+  function toggleAiPanel(forceOpen) {
+    aiOpen = typeof forceOpen === 'boolean' ? forceOpen : !aiOpen;
+    $('aiPanel').classList.toggle('open', aiOpen);
+    $('aiFab').setAttribute('aria-expanded', String(aiOpen));
+    if (aiOpen) {
+      $('unreadDot').classList.remove('show');
+      $('aiToast').classList.remove('show');
+      $('aiHist').scrollTop = $('aiHist').scrollHeight;
+      $('aiInput').focus();
+    }
+  }
+
+  $('aiFab').onclick = () => toggleAiPanel();
+  $('aiClose').onclick = () => toggleAiPanel(false);
+  $('aiToastClose').onclick = e => {
+    e.stopPropagation();
+    $('aiToast').classList.remove('show');
+  };
+  $('aiToast').onclick = () => toggleAiPanel(true);
+
+  function showToast(text) {
+    if (aiOpen) return;
+    $('aiToastText').textContent = text;
+    $('aiToast').classList.add('show');
+    $('unreadDot').classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      $('aiToast').classList.remove('show');
+    }, 5500);
+  }
+
+  function pushTeacherMsg(html, showDot = true) {
+    const row = document.createElement('div');
+    row.className = 'm t';
+    row.innerHTML = '<div class="bub">' + html + '</div>';
+    $('aiHist').appendChild(row);
+    $('aiHist').scrollTop = $('aiHist').scrollHeight;
+    if (!aiOpen && showDot) {
+      $('unreadDot').classList.add('show');
+    }
+  }
+
+  function pushStudentMsg(text) {
+    const row = document.createElement('div');
+    row.className = 'm s';
+    row.innerHTML = '<div class="bub">' + esc(text) + '</div>';
+    $('aiHist').appendChild(row);
+    $('aiHist').scrollTop = $('aiHist').scrollHeight;
+  }
+
+  function generateReply(q) {
+    const expr = $('fin').value.trim();
+    const ax = parseFloat($('sA').value);
+    const ay = f(ax);
+    const mt = df(ax);
+    const b = ay - mt * ax;
+    const px = parseFloat($('sP').value);
+    const py = f(px);
+    const A = '<b>A(' + fmtFix(ax, 2) + ', ' + fmtFix(ay, 2) + ')</b>';
+
+    if (/0\s*\/\s*0|重疊|分母為\s*0/.test(q)) {
+      return '問得太好了！當動點 P 與定點 A 重疊（x = a）時，水平差 x − a 與高度差 f(x) − f(a) 都變成 0，算式會出現 <b>0 / 0（無意義）</b>，而且單一個點也連不出直線。<br>因此數學上引入極限 <b>lim (x → a)</b>，意思是「讓 x 無限逼近 a，但 <b>x ≠ a</b>」，就能完美避開 0 / 0 又求出切線斜率 <b>' + fmtFix(mt, 3) + '</b>！';
+    }
+    if (/lim|極限|導數|f′|f'/.test(q)) {
+      return '<b>lim (x → a)</b> 代表「讓 x 無限靠近 a，但不等於 a（x ≠ a）」。<br>把這個概念用在割線斜率上，就得到導數定義：<b>f′(a) = lim (x → a) [f(x) − f(a)] / (x − a)</b>，它就是函數圖形在 x = a 處的<b>切線斜率</b>！目前在 ' + A + ' 的導數約為 <b>' + fmtFix(mt, 3) + '</b>。';
+    }
+    if (/正負|傾斜|水平|鉛直/.test(q)) {
+      return '看直線的傾斜方向就能馬上判斷斜率正負：<br>• ↗ 往右上傾斜：<b>斜率為正</b><br>• ↘ 往右下傾斜：<b>斜率為負</b><br>• ↔ 水平線：高度不變，<b>斜率為 0</b><br>• ↕ 鉛直線：水平差為 0，<b>無斜率（分母為 0）</b>';
+    }
+    if (/放大|變直線|局部|地球/.test(q)) {
+      return '這就像我們站在地球表面會以為地面是平的一樣 🌍！平滑曲線只要用顯微鏡放大到 80 倍看點 ' + A + ' 附近極小的一段，彎曲幾乎消失，看起來就像一條筆直的線，這就是微積分「局部直線化（以直代曲）」的精神！';
+    }
+    if (/切線方程式|怎麼算|切線.*多少|目前/.test(q)) {
+      const sign = b >= 0 ? ' + ' : ' − ';
+      return '老師幫你整理目前點 ' + A + ' 的切線：<br>• 函數：<b>' + prettyFnHTML(expr) + '</b><br>• 切點：' + A + '<br>• 切線斜率：<b>f′(' + fmtFix(ax, 2) + ') = ' + fmtFix(mt, 3) + '</b><br>• 切線方程式：<b class="c-ok">y = ' + fmtFix(mt, 2) + 'x' + sign + fmtFix(Math.abs(b), 2) + '</b>';
+    }
+    if (/割線|差在哪/.test(q)) {
+      return '• <b>割線</b>：連接曲線上兩個相異點 A、P 的直線，斜率是 [f(x) − f(a)] / (x − a)。<br>• <b>切線</b>：讓動點 P 沿曲線無限逼近 A（x → a 且 x ≠ a）時，割線穩定下來的極限位置！';
+    }
+    if (/交於一點|一個交點/.test(q)) {
+      return '好觀念！國中學的「圓的切線」確實只交於一點，但對三次函數等一般曲線來說，<b>切線是在點 A 附近最貼合曲線的直線</b>，延伸出去後仍可能在其他地方再次與曲線相交喔！';
+    }
+
+    if (step === 0) {
+      const dx = ptB.x - ptA.x, dy = ptB.y - ptA.y;
+      const mTxt = Math.abs(dx) < 1e-9 ? '無斜率（鉛直線）' : fmtFix(dy / dx, 2);
+      return '你目前在「暖身」步驟，A(' + fmtFix(ptA.x, 1) + ', ' + fmtFix(ptA.y, 1) + ') 與 B(' + fmtFix(ptB.x, 1) + ', ' + fmtFix(ptB.y, 1) + ') 的直線斜率是 <b>' + mTxt + '</b>。試著完成小挑戰，再點按鈕進入曲線探索吧！';
+    }
+    if (step === 5) {
+      const dx = px - ax;
+      if (Math.abs(dx) < 1e-5) {
+        return '你正停在 <b>P 與 A 重疊（0 / 0）</b>的狀態！試著點一下「a + 0.001」或「a − 0.001」，感受為什麼我們必須加上極限 <b>lim (x → a)</b>！';
+      }
+      const ms = (py - ay) / dx;
+      return '你在步驟 5 做得很棒！目前 P(' + fmtFix(px, 3) + ', ' + fmtFix(py, 3) + ') 與 ' + A + ' 的割線斜率是 <b>' + fmtFix(ms, 3) + '</b>，正逐漸逼近切線真實斜率 <b>' + fmtFix(mt, 3) + '</b>。';
+    }
+    return '很棒的思考！目前我們在探索 <b>' + prettyFnHTML(expr) + '</b> 於 ' + A + ' 的局部特徵，切線斜率約為 <b>' + fmtFix(mt, 3) + '</b>。你可以點上方的快捷問題按鈕，老師會為你詳細解說喔！';
+  }
+
+  function handleAsk(raw) {
+    const q = raw.trim();
+    if (!q) return;
+    pushStudentMsg(q);
+    $('aiInput').value = '';
+    setTimeout(() => {
+      pushTeacherMsg(generateReply(q), false);
+    }, 220);
+  }
+
+  document.querySelectorAll('[data-ask]').forEach(btn => {
+    btn.onclick = () => handleAsk(btn.dataset.ask);
+  });
+  $('aiSend').onclick = () => handleAsk($('aiInput').value);
+  $('aiInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleAsk($('aiInput').value);
+  });
+
+  // 初始化進入步驟 0
+  goToStep(0);
+})();
+</script>
+</body>
+</html>
